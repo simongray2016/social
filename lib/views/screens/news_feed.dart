@@ -17,9 +17,35 @@ class NewsFeedScreen extends StatelessWidget {
 }
 
 class StorySection extends StatelessWidget {
-  const StorySection({
+  StorySection({
     Key? key,
   }) : super(key: key);
+
+  final listStory = [
+    {
+      'storyUrl':
+          'https://i.insider.com/5484b33a6da8119577fbada9?width=800&format=jpeg&auto=webp',
+      'avatarUrl':
+          'https://images.unsplash.com/photo-1615751072497-5f5169febe17?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y3V0ZSUyMGRvZ3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
+    },
+    {
+      'storyUrl':
+          'https://i.pinimg.com/originals/80/d3/64/80d364e09d31fcba8af274926d4332ff.jpg',
+      'avatarUrl':
+          'https://ae01.alicdn.com/kf/H140a3cd48cf04209b235daee3c9d5cc5y/Winter-Cute-Dog-Clothes-Cartoons-Fruit-Dog-Hoodie-Coat-Outdoor-Warm-Puppy-Small-Medium-Dogs-Pet.jpg_q50.jpg',
+    },
+    {
+      'storyUrl':
+          'https://images.unsplash.com/photo-1529778873920-4da4926a72c2?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8Y3V0ZSUyMGNhdHxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
+      'avatarUrl':
+          'https://i1.sndcdn.com/avatars-000600452151-38sfei-t240x240.jpg',
+    },
+    {
+      'storyUrl':
+          'https://cutecatshq.com/wp-content/uploads/2016/12/What-type-of-cat-is-this.jpg',
+      'avatarUrl': 'https://i.redd.it/6giqv6zjkog21.jpg',
+    }
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +56,12 @@ class StorySection extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         children: [
           SizedBox(width: 20),
-          StoryPreviewCard(),
+          ...listStory.map(
+            (e) => StoryPreviewCard(
+              storyUrl: e['storyUrl'],
+              avatarUrl: e['avatarUrl'],
+            ),
+          ),
           SizedBox(width: 20),
         ],
       ),
@@ -39,8 +70,13 @@ class StorySection extends StatelessWidget {
 }
 
 class StoryPreviewCard extends StatelessWidget {
-  const StoryPreviewCard({
+  late final String? storyUrl;
+  late final String? avatarUrl;
+
+  StoryPreviewCard({
     Key? key,
+    required this.storyUrl,
+    required this.avatarUrl,
   }) : super(key: key);
 
   @override
@@ -56,7 +92,7 @@ class StoryPreviewCard extends StatelessWidget {
       child: Stack(
         children: [
           Image.network(
-            'https://i.insider.com/5484b33a6da8119577fbada9?width=800&format=jpeg&auto=webp',
+            storyUrl ?? '',
             height: 170,
             width: 100,
             fit: BoxFit.cover,
@@ -96,8 +132,7 @@ class StoryPreviewCard extends StatelessWidget {
                   ),
                   padding: EdgeInsets.all(2),
                   child: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        'https://demo.digityze.asia/ilearning/wp-content/themes/cera-child/assets/images/avatars/user-avatar.png'),
+                    backgroundImage: NetworkImage(avatarUrl ?? ''),
                   ),
                 ),
               ),
