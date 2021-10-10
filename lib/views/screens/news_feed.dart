@@ -1,24 +1,20 @@
+import 'dart:ffi';
+
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:social/constant/colors.dart';
 import 'package:social/views/widgets/skeleton_loading.dart';
 
 class NewsFeedScreen extends StatelessWidget {
-  const NewsFeedScreen({Key? key}) : super(key: key);
+  final list = List.filled(100, PostSection(), growable: true);
+  NewsFeedScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWithUserName(),
       body: ListView(
-        children: [
-          StorySection(),
-          PostSection(),
-          PostSection(),
-          PostSection(),
-          PostSection(),
-          PostSection(),
-        ],
+        children: [StorySection(), ...list],
       ),
     );
   }

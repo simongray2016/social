@@ -8,6 +8,7 @@ import 'package:social/views/screens/news_feed.dart';
 import 'package:social/views/screens/notifications.dart';
 import 'package:social/views/screens/profile.dart';
 import 'package:social/views/screens/search.dart';
+import 'package:social/views/widgets/keep_alive.dart';
 
 void main() {
   runApp(MyApp());
@@ -33,10 +34,11 @@ class MyHomeScreen extends StatefulWidget {
 }
 
 class _MyHomeScreenState extends State<MyHomeScreen> {
-  late StreamSubscription _streamSubscription;
-  final _currentPageSubject = BehaviorSubject<int>();
-  final PageController _pageController = PageController(initialPage: 0);
-  int _currentPage = 0;
+  final BehaviorSubject<int> _currentPageSubject =
+      BehaviorSubject<int>(sync: true);
+  late final Stream<int> _curentPageStream;
+  final PageController _pageController =
+      PageController(initialPage: 0, keepPage: true);
 
   _nextPage(int page) {
     _pageController.animateToPage(
@@ -46,25 +48,20 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     );
   }
 
-  _listenPageChangedToSetState() {
-    _streamSubscription = _currentPageSubject.stream
-        .debounceTime(Duration(milliseconds: 50))
-        .listen((page) => setState(() => _currentPage = page));
-  }
-
-  _cancelSubsription() {
-    _streamSubscription.cancel();
+  _onPageChanged(int page) {
+    _currentPageSubject.add(page);
   }
 
   @override
   void initState() {
-    _listenPageChangedToSetState();
+    _currentPageSubject.add(0);
+    _curentPageStream =
+        _currentPageSubject.debounceTime(Duration(milliseconds: 50));
     super.initState();
   }
 
   @override
   void dispose() {
-    _cancelSubsription();
     super.dispose();
   }
 
@@ -73,60 +70,64 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     return SafeArea(
       child: Scaffold(
         body: PageView(
-          onPageChanged: (page) => _currentPageSubject.add(page),
+          onPageChanged: (page) => _onPageChanged(page),
           scrollDirection: Axis.horizontal,
           controller: _pageController,
           children: [
-            NewsFeedScreen(),
+            KeepAlivePage(child: NewsFeedScreen()),
             SearchScreen(),
             NotificationsScreen(),
             ProfileScreen(),
           ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          child: Container(
-            height: 70,
-            color: kBlack,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  color: _currentPage == 0 ? kWhite : kLightGray,
-                  onPressed: () => _nextPage(0),
-                  icon: Icon(Icons.web_outlined),
-                ),
-                IconButton(
-                  color: _currentPage == 1 ? kWhite : kLightGray,
-                  onPressed: () => _nextPage(1),
-                  icon: Icon(
-                    Icons.search_outlined,
+        bottomNavigationBar: StreamBuilder<int>(
+            stream: _curentPageStream,
+            builder: (context, snapshot) {
+              return BottomAppBar(
+                child: Container(
+                  height: 70,
+                  color: kBlack,
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        color: snapshot.data == 0 ? kWhite : kLightGray,
+                        onPressed: () => _nextPage(0),
+                        icon: Icon(Icons.web_outlined),
+                      ),
+                      IconButton(
+                        color: snapshot.data == 1 ? kWhite : kLightGray,
+                        onPressed: () => _nextPage(1),
+                        icon: Icon(
+                          Icons.search_outlined,
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                            gradient: kLinearGradient,
+                            borderRadius: BorderRadius.circular(100)),
+                        child: IconButton(
+                          onPressed: () => null,
+                          icon: Icon(Icons.add_outlined),
+                        ),
+                      ),
+                      IconButton(
+                        color: snapshot.data == 2 ? kWhite : kLightGray,
+                        onPressed: () => _nextPage(2),
+                        icon: Icon(Icons.notifications_outlined),
+                      ),
+                      IconButton(
+                        color: snapshot.data == 3 ? kWhite : kLightGray,
+                        onPressed: () => _nextPage(3),
+                        icon: Icon(Icons.account_circle_outlined),
+                      ),
+                    ],
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      gradient: kLinearGradient,
-                      borderRadius: BorderRadius.circular(100)),
-                  child: IconButton(
-                    onPressed: () => null,
-                    icon: Icon(Icons.add_outlined),
-                  ),
-                ),
-                IconButton(
-                  color: _currentPage == 2 ? kWhite : kLightGray,
-                  onPressed: () => _nextPage(2),
-                  icon: Icon(Icons.notifications_outlined),
-                ),
-                IconButton(
-                  color: _currentPage == 3 ? kWhite : kLightGray,
-                  onPressed: () => _nextPage(3),
-                  icon: Icon(Icons.account_circle_outlined),
-                ),
-              ],
-            ),
-          ),
-        ), // This trailing comma makes auto-formatting nicer for build methods.
+              );
+            }), // This trailing comma makes auto-formatting nicer for build methods.
       ),
     );
   }
