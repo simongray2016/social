@@ -13,9 +13,137 @@ class NewsFeedScreen extends StatelessWidget {
       body: ListView(
         children: [
           StorySection(),
-          Divider(),
+          PostSection(),
+          PostSection(),
+          PostSection(),
+          PostSection(),
+          PostSection(),
         ],
       ),
+    );
+  }
+}
+
+class PostSection extends StatelessWidget {
+  const PostSection({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(17),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.only(right: 10),
+                        width: 40,
+                        height: 40,
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              'https://i1.sndcdn.com/avatars-000600452151-38sfei-t240x240.jpg'),
+                        ),
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Daniel Trương',
+                            style: Theme.of(context).textTheme.headline2,
+                          ),
+                          Text(
+                            '20m ago',
+                            style: Theme.of(context).textTheme.headline3,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () => null,
+                    icon: Icon(Icons.more_vert),
+                  )
+                ],
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                width: double.infinity,
+                child: RichText(
+                  text: TextSpan(
+                    text: 'I try my best \n~Daniel Truong',
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      SocialActionButton(
+                        icon: Icons.thumb_up_outlined,
+                        text: '2,345',
+                      ),
+                      SizedBox(width: 20),
+                      SocialActionButton(
+                        icon: Icons.textsms_outlined,
+                        text: '45',
+                      ),
+                      SizedBox(width: 20),
+                      SocialActionButton(
+                        icon: Icons.share_outlined,
+                        text: '120',
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () => null,
+                    icon: Icon(
+                      Icons.bookmark_outline,
+                      size: 22,
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+        Divider()
+      ],
+    );
+  }
+}
+
+class SocialActionButton extends StatelessWidget {
+  late final IconData icon;
+  late final String text;
+
+  SocialActionButton({Key? key, required this.icon, required this.text})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+        ),
+        SizedBox(width: 10),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodyText2,
+        )
+      ],
     );
   }
 }
@@ -56,6 +184,15 @@ class StorySection extends StatelessWidget {
     return Container(
       height: 170,
       padding: EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: kGray,
+            style: BorderStyle.solid,
+            width: 0.5,
+          ),
+        ),
+      ),
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
@@ -154,11 +291,28 @@ class StoryPreviewCard extends StatelessWidget {
   }
 }
 
-// ignore: non_constant_identifier_names
-final AppBarWithUserName = () => AppBar(
+class AppBarWithUserName extends StatefulWidget implements PreferredSizeWidget {
+  AppBarWithUserName({Key? key})
+      : preferredSize = Size.fromHeight(kToolbarHeight),
+        super(key: key);
+
+  @override
+  final Size preferredSize; // default is 56.0
+
+  @override
+  _AppBarWithUserNameState createState() => _AppBarWithUserNameState();
+}
+
+class _AppBarWithUserNameState extends State<AppBarWithUserName> {
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
       title: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10),
-        child: Text('Good morning, Alex'),
+        child: Text(
+          'Good morning, Alex',
+          style: Theme.of(context).textTheme.headline1,
+        ),
       ),
       actions: [
         Center(
@@ -186,3 +340,5 @@ final AppBarWithUserName = () => AppBar(
         )
       ],
     );
+  }
+}
