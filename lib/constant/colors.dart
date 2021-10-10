@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+const skeletonGradient = LinearGradient(
+  colors: [kGray, kLightGray, kGray],
+  stops: [0, 0.5, 1],
+  begin: Alignment(-1.0, -0.3),
+  end: Alignment(1.0, 0.3),
+  tileMode: TileMode.clamp,
+);
 const kLinearGradient = LinearGradient(
   colors: [kGradientStart, kGradientEnd],
   begin: Alignment.centerLeft,

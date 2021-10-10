@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:social/constant/colors.dart';
+import 'package:social/views/widgets/skeleton_loading.dart';
 
 class NewsFeedScreen extends StatelessWidget {
   const NewsFeedScreen({Key? key}) : super(key: key);
@@ -10,7 +11,10 @@ class NewsFeedScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBarWithUserName(),
       body: ListView(
-        children: [StorySection()],
+        children: [
+          StorySection(),
+          Divider(),
+        ],
       ),
     );
   }
@@ -91,11 +95,14 @@ class StoryPreviewCard extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          Image.network(
-            storyUrl ?? '',
-            height: 170,
-            width: 100,
-            fit: BoxFit.cover,
+          SkeletonLoadingContainer(
+            loading: false,
+            child: Image.network(
+              storyUrl ?? '',
+              height: 170,
+              width: 100,
+              fit: BoxFit.cover,
+            ),
           ),
           Opacity(
             opacity: 0.5,
@@ -131,8 +138,11 @@ class StoryPreviewCard extends StatelessWidget {
                     color: kBlack,
                   ),
                   padding: EdgeInsets.all(2),
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(avatarUrl ?? ''),
+                  child: SkeletonLoadingContainer(
+                    loading: false,
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(avatarUrl ?? ''),
+                    ),
                   ),
                 ),
               ),
