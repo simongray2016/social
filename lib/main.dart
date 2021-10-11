@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social/bloc/bottom_navigation/bottom_navigation_cubit.dart';
 import 'package:social/constant/colors.dart';
 import 'package:social/theme/app_theme.dart';
 import 'package:social/views/screens/news_feed.dart';
@@ -20,7 +22,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Social',
       theme: AppTheme.dark(),
-      home: MyHomeScreen(),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => BottomNavigationCubit()),
+        ],
+        child: MyHomeScreen(),
+      ),
       themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
     );
@@ -40,12 +47,19 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
   final PageController _pageController =
       PageController(initialPage: 0, keepPage: true);
 
-  _nextPage(int page) {
-    _pageController.animateToPage(
-      page,
-      duration: Duration(milliseconds: 200),
-      curve: Curves.ease,
-    );
+  _nextPage(int nextPage) {
+    final int prevPage =
+        context.read<BottomNavigationCubit>().state.currentPage;
+
+    if (prevPage != nextPage) {
+      _pageController.animateToPage(
+        nextPage,
+        duration: Duration(milliseconds: 200),
+        curve: Curves.ease,
+      );
+    } else {
+      context.read<BottomNavigationCubit>().scrollTopPage();
+    }
   }
 
   _onPageChanged(int page) {
@@ -57,6 +71,10 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
     _currentPageSubject.add(0);
     _curentPageStream =
         _currentPageSubject.debounceTime(Duration(milliseconds: 50));
+
+    _curentPageStream.listen((page) {
+      context.read<BottomNavigationCubit>().pageChanged(page);
+    });
     super.initState();
   }
 
@@ -75,14 +93,16 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
           controller: _pageController,
           children: [
             KeepAlivePage(child: NewsFeedScreen()),
-            SearchScreen(),
-            NotificationsScreen(),
-            ProfileScreen(),
+            KeepAlivePage(child: SearchScreen()),
+            KeepAlivePage(child: NotificationsScreen()),
+            KeepAlivePage(child: ProfileScreen()),
           ],
         ),
-        bottomNavigationBar: StreamBuilder<int>(
-            stream: _curentPageStream,
-            builder: (context, snapshot) {
+        bottomNavigationBar: BlocBuilder<BottomNavigationCubit,
+                BottomNavigationState>(
+            buildWhen: (prev, current) =>
+                current.currentPage != prev.currentPage,
+            builder: (context, state) {
               return BottomAppBar(
                 child: Container(
                   height: 70,
@@ -93,12 +113,12 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        color: snapshot.data == 0 ? kWhite : kLightGray,
+                        color: state.currentPage == 0 ? kWhite : kLightGray,
                         onPressed: () => _nextPage(0),
                         icon: Icon(Icons.web_outlined),
                       ),
                       IconButton(
-                        color: snapshot.data == 1 ? kWhite : kLightGray,
+                        color: state.currentPage == 1 ? kWhite : kLightGray,
                         onPressed: () => _nextPage(1),
                         icon: Icon(
                           Icons.search_outlined,
@@ -114,12 +134,12 @@ class _MyHomeScreenState extends State<MyHomeScreen> {
                         ),
                       ),
                       IconButton(
-                        color: snapshot.data == 2 ? kWhite : kLightGray,
+                        color: state.currentPage == 2 ? kWhite : kLightGray,
                         onPressed: () => _nextPage(2),
                         icon: Icon(Icons.notifications_outlined),
                       ),
                       IconButton(
-                        color: snapshot.data == 3 ? kWhite : kLightGray,
+                        color: state.currentPage == 3 ? kWhite : kLightGray,
                         onPressed: () => _nextPage(3),
                         icon: Icon(Icons.account_circle_outlined),
                       ),

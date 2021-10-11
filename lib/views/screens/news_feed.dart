@@ -1,20 +1,41 @@
-import 'dart:ffi';
-
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social/bloc/bottom_navigation/bottom_navigation_cubit.dart';
 import 'package:social/constant/colors.dart';
 import 'package:social/views/widgets/skeleton_loading.dart';
 
 class NewsFeedScreen extends StatelessWidget {
   final list = List.filled(100, PostSection(), growable: true);
+  final _scrollController = ScrollController();
+
   NewsFeedScreen({Key? key}) : super(key: key);
+
+  void _scrollToTop(BuildContext context) {
+    _scrollController.animateTo(
+      0,
+      duration: Duration(seconds: 1),
+      curve: Curves.ease,
+    );
+
+    context.read<BottomNavigationCubit>().pageScrolled();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWithUserName(),
-      body: ListView(
-        children: [StorySection(), ...list],
+    return BlocListener<BottomNavigationCubit, BottomNavigationState>(
+      listener: (context, state) {
+        if (state.isScrollToTop) _scrollToTop(context);
+      },
+      child: Scaffold(
+        appBar: AppBarWithUserName(),
+        body: ListView(
+          controller: _scrollController,
+          children: [
+            StorySection(),
+            ...list,
+          ],
+        ),
       ),
     );
   }
