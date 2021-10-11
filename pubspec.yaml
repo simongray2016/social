@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  firebase_core: ^1.7.0
   flutter_bloc: ^7.3.0
   rxdart: ^0.27.2
   badges: ^2.0.1

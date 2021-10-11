@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,23 +14,47 @@ import 'package:social/views/screens/search.dart';
 import 'package:social/views/widgets/keep_alive.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final Future<FirebaseApp> _intialization = Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Social',
-      theme: AppTheme.dark(),
-      home: MultiBlocProvider(
-        providers: [
-          BlocProvider(create: (_) => BottomNavigationCubit()),
-        ],
-        child: MyHomeScreen(),
-      ),
-      themeMode: ThemeMode.dark,
-      debugShowCheckedModeBanner: false,
+    return FutureBuilder(
+      future: _intialization,
+      builder: (_, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return MaterialApp(
+            title: 'Social',
+            theme: AppTheme.dark(),
+            home: MultiBlocProvider(
+              providers: [
+                BlocProvider(create: (_) => BottomNavigationCubit()),
+              ],
+              child: MyHomeScreen(),
+            ),
+            themeMode: ThemeMode.dark,
+            debugShowCheckedModeBanner: false,
+          );
+        }
+
+        return MaterialApp(
+          home: Scaffold(
+            backgroundColor: kBlack,
+            body: Center(
+              child: Text('loading'),
+            ),
+          ),
+        );
+      },
     );
   }
 }
