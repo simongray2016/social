@@ -5,20 +5,34 @@ import 'package:social/bloc/bottom_navigation/bottom_navigation_cubit.dart';
 import 'package:social/constant/colors.dart';
 import 'package:social/views/widgets/skeleton_loading.dart';
 
-class NewsFeedScreen extends StatelessWidget {
-  final list = List.filled(100, PostSection(), growable: true);
-  final _scrollController = ScrollController();
-
+class NewsFeedScreen extends StatefulWidget {
   NewsFeedScreen({Key? key}) : super(key: key);
 
+  @override
+  _NewsFeedScreenState createState() => _NewsFeedScreenState();
+}
+
+class _NewsFeedScreenState extends State<NewsFeedScreen> {
+  final List<dynamic> _list = List.filled(100, PostSection(), growable: true);
+
+  final _scrollController = ScrollController();
+
   void _scrollToTop(BuildContext context) {
+    final offset = _scrollController.offset;
+    final duraion = Duration(milliseconds: (offset / 10).ceil() + 1000);
+
     _scrollController.animateTo(
       0,
-      duration: Duration(seconds: 1),
+      duration: duraion,
       curve: Curves.ease,
     );
 
     context.read<BottomNavigationCubit>().pageScrolled();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
@@ -29,12 +43,11 @@ class NewsFeedScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBarWithUserName(),
-        body: ListView(
+        body: ListView.builder(
           controller: _scrollController,
-          children: [
-            StorySection(),
-            ...list,
-          ],
+          itemBuilder: (context, index) =>
+              index == 0 ? StorySection() : _list[index - 1],
+          itemCount: _list.length,
         ),
       ),
     );
