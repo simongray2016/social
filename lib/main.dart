@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social/bloc/bottom_navigation/bottom_navigation_cubit.dart';
 import 'package:social/constant/colors.dart';
 import 'package:social/theme/app_theme.dart';
+import 'package:social/views/screens/loading.dart';
 import 'package:social/views/screens/news_feed.dart';
 import 'package:social/views/screens/notifications.dart';
 import 'package:social/views/screens/profile.dart';
@@ -33,7 +34,7 @@ class _MyAppState extends State<MyApp> {
       builder: (_, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return MaterialApp(
-            title: 'Social',
+            title: 'Social.',
             theme: AppTheme.dark(),
             home: MultiBlocProvider(
               providers: [
@@ -46,14 +47,7 @@ class _MyAppState extends State<MyApp> {
           );
         }
 
-        return MaterialApp(
-          home: Scaffold(
-            backgroundColor: kBlack,
-            body: Center(
-              child: Text('loading'),
-            ),
-          ),
-        );
+        return SplashScreen();
       },
     );
   }
